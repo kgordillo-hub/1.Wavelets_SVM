@@ -19,7 +19,7 @@
     }
   ],
   "paths": {
-    "/trainModels": {
+    "/trainModel": {
       "post": {
         "description": "Endpoint para lanzar el entrenamiento del modelo de ML",
         "requestBody": {
