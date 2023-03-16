@@ -1,0 +1,199 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ML Forex API",
+    "description": "Esta es la descripción del esquema que deben seguir las API a vincular",
+    "contact": {
+      "email": "you@your-company.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://virtserver.swaggerhub.com/milam940/MlForex_spec/1.0.0",
+      "description": "API spec for ML APIs"
+    }
+  ],
+  "paths": {
+    "/trainModel": {
+      "post": {
+        "description": "Endpoint para lanzar el entrenamiento del modelo de ML",
+        "requestBody": {
+          "description": "Entrenamiento de modelo de ML",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrainingInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Procesado"
+          },
+          "415": {
+            "description": "La petición está vacía"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
+    },
+    "/predict": {
+      "post": {
+        "description": "Endpoint para lanzar la predicción del modelo de ML",
+        "requestBody": {
+          "description": "Realizar predicción usando el modelo de ML",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PredictInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Procesado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PredictResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Se debe llamar al endpoint de entrenamiento primero"
+          },
+          "415": {
+            "description": "La petición está vacía"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
+    },
+	"/predict2": {
+      "post": {
+        "description": "Endpoint para lanzar la predicción del modelo de ML",
+        "requestBody": {
+          "description": "Realizar predicción usando el modelo de ML",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PredictInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Procesado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PredictResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Se debe llamar al endpoint de entrenamiento primero"
+          },
+          "415": {
+            "description": "La petición está vacía"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TrainingInfo": {
+        "required": [
+          "closing_price",
+          "dates"
+        ],
+        "type": "object",
+        "properties": {
+          "closing_price": {
+            "type": "array",
+            "example": [
+              4557.2001,
+              4571.7002,
+              4539.39
+            ],
+            "items": {
+              "type": "number"
+            }
+          },
+          "dates": {
+            "type": "array",
+            "example": [
+              "2022-01-03",
+              "2022-01-04",
+              "2022-01-05"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PredictInfo": {
+        "required": [
+          "days_to_predict"
+        ],
+        "type": "object",
+        "properties": {
+          "days_to_predict": {
+            "type": "integer",
+            "example": 7
+          }
+        }
+      },
+      "PredictResponse": {
+        "required": [
+          "Dates",
+          "Predicted_values"
+        ],
+        "type": "object",
+        "properties": {
+          "Predicted_values": {
+            "type": "array",
+            "example": [
+              4492.056180239942,
+              4462.909549475446,
+              4467.205980670348
+            ],
+            "items": {
+              "type": "number"
+            }
+          },
+          "Dates": {
+            "type": "array",
+            "example": [
+              "2022-07-30",
+              "2022-07-31",
+              "2022-08-01"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
