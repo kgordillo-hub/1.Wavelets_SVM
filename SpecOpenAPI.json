@@ -21,7 +21,7 @@
   "paths": {
     "/trainModel": {
       "post": {
-        "description": "Endpoint para lanzar el entrenamiento del modelo de ML",
+        "description": "Endpoint para lanzar el entrenamiento del modelo de ML, entra el archivo CSV en B64",
         "requestBody": {
           "description": "Entrenamiento de modelo de ML",
           "content": {
@@ -47,43 +47,7 @@
     },
     "/predict": {
       "post": {
-        "description": "Endpoint para lanzar la predicción del modelo de ML",
-        "requestBody": {
-          "description": "Realizar predicción usando el modelo de ML",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PredictInfo"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Procesado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PredictResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Se debe llamar al endpoint de entrenamiento primero"
-          },
-          "415": {
-            "description": "La petición está vacía"
-          },
-          "500": {
-            "description": "Error interno"
-          }
-        }
-      }
-    },
-	"/predict2": {
-      "post": {
-        "description": "Endpoint para lanzar la predicción del modelo de ML",
+        "description": "Endpoint para lanzar la predicción del modelo de ML, entra el archivo CSV en B64",
         "requestBody": {
           "description": "Realizar predicción usando el modelo de ML",
           "content": {
@@ -122,75 +86,59 @@
     "schemas": {
       "TrainingInfo": {
         "required": [
-          "closing_price",
-          "dates"
+          "UID",
+          "data",
+          "endpoint_notificacion"
         ],
         "type": "object",
         "properties": {
-          "closing_price": {
-            "type": "array",
-            "example": [
-              4557.2001,
-              4571.7002,
-              4539.39
-            ],
-            "items": {
-              "type": "number"
-            }
+          "data": {
+            "type": "string",
+            "description": "Archivo CSV con la información de entrada",
+            "example": "Y2xvc2luZ19wcmljZSxkYXRlcwo0NTU3LjIwMDE5NTMxMjUsMjAyMi0wMS0wMwo0NTcxLjcwMDE5NTMxMjUsMjAyMi0wMS0wNAo0NTM5LjM5OTkwMjM0Mzc1LDIwMjItMDEtMDUKNDU2OC4zOTk5MDIzNDM3NSwyMDIyLTAxLTA2CjQ1MDQuMTAwMDk3NjU2MjUsMjAyMi0wMS0wNwo0NTEwLjc5OTgwNDY4NzUsMjAyMi0wMS0xMAo0NTM4LDIwMjItMDEtMTEKNDU0My4zOTk5MDIzNDM3NSwyMDIyLTAxLTEyCjQ0ODUuNSwyMDIyLTAxLTEz"
           },
-          "dates": {
-            "type": "array",
-            "example": [
-              "2022-01-03",
-              "2022-01-04",
-              "2022-01-05"
-            ],
-            "items": {
-              "type": "string"
-            }
+          "endpoint_notificacion": {
+            "type": "string",
+            "example": "http://localhost:8083/actualizarEstadoModelo"
+          },
+          "UID": {
+            "type": "string",
+            "example": "ed806eaa-c596-11ed-afa1-0242ac120002"
           }
         }
       },
       "PredictInfo": {
         "required": [
-          "days_to_predict"
+          "UID",
+          "days_to_predict",
+          "endpoint_notificacion"
         ],
         "type": "object",
         "properties": {
           "days_to_predict": {
             "type": "integer",
             "example": 7
+          },
+          "endpoint_notificacion": {
+            "type": "string",
+            "example": "http://localhost:8083/actualizarEstadoModelo"
+          },
+          "UID": {
+            "type": "string",
+            "example": "ed806eaa-c596-11ed-afa1-0242ac120002"
           }
         }
       },
       "PredictResponse": {
         "required": [
-          "Dates",
-          "Predicted_values"
+          "result"
         ],
         "type": "object",
         "properties": {
-          "Predicted_values": {
-            "type": "array",
-            "example": [
-              4492.056180239942,
-              4462.909549475446,
-              4467.205980670348
-            ],
-            "items": {
-              "type": "number"
-            }
-          },
-          "Dates": {
-            "type": "array",
-            "example": [
-              "2022-07-30",
-              "2022-07-31",
-              "2022-08-01"
-            ],
-            "items": {
-              "type": "string"
-            }
+          "result": {
+            "type": "string",
+            "description": "Respuesta de procesamiento",
+            "example": "Processed"
           }
         }
       }
