@@ -8,13 +8,17 @@ from numpy.lib.stride_tricks import sliding_window_view
 # https://github.com/pistonly/modwtpy/blob/master/modwt.py
 from Algorithm.lib.modwt import modwt, imodwt
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+#import time
 
 X_global = []
 Y_global = []
 dates_global = []
-
+sc_y = None
+svr = None
 
 def train_model(closing_prices, dates, window_length=12):
+    #time.sleep(10)
     print("Training model...")
     global dates_global
     dates_global = dates
@@ -34,6 +38,7 @@ def train_model(closing_prices, dates, window_length=12):
     # training model using approx. coefficients
     X, Y = slide_window(dFs, window_length)
     sc_x = MinMaxScaler(feature_range=(0, 1))
+    global sc_y
     sc_y = MinMaxScaler(feature_range=(0, 1))
 
     global X_global
@@ -41,12 +46,21 @@ def train_model(closing_prices, dates, window_length=12):
     global Y_global
     Y_global = sc_y.fit_transform(np.reshape(Y, (-1, 1))).ravel()
 
+    x_train,x_test,y_train,y_test = train_test_split(X_global, Y_global, test_size=0.25, random_state=None, shuffle=False)
+
+    y_pred = train_model_approx(x_train, y_train).predict(x_test)
+
+    global svr
     svr = train_model_approx(X_global, Y_global)
 
-    return svr, sc_y
+    print("Training completed...")
+    y_pred = sc_y.inverse_transform(y_pred.reshape(1, -1)).ravel()
+    y_test = sc_y.inverse_transform(y_test.reshape(1, -1)).ravel()
+    return y_pred, y_test
 
 
-def make_prediction(svr, prediction_days=3, past_days=12):
+def make_prediction(prediction_days=3, past_days=12):
+    global svr, sc_y
     global Y_global
     global X_global
 
@@ -63,7 +77,10 @@ def make_prediction(svr, prediction_days=3, past_days=12):
         X_ = np.concatenate((X_, X_Y_concat))
         p_value = svr.predict(X_[-1].reshape(1, -1))
         Y_ = np.concatenate((Y_, p_value))
-    return Y_[:prediction_days], add_day_to_dates(prediction_days)
+
+    y_pred = Y_[:prediction_days]
+    result = sc_y.inverse_transform(y_pred.reshape(1, -1)).ravel()
+    return result, add_day_to_dates(prediction_days)
 
 
 # Implementing slide window

@@ -86,9 +86,7 @@
     "schemas": {
       "TrainingInfo": {
         "required": [
-          "UID",
-          "data",
-          "endpoint_notificacion"
+          "data"
         ],
         "type": "object",
         "properties": {
@@ -96,36 +94,18 @@
             "type": "string",
             "description": "Archivo CSV con la información de entrada",
             "example": "Y2xvc2luZ19wcmljZSxkYXRlcwo0NTU3LjIwMDE5NTMxMjUsMjAyMi0wMS0wMwo0NTcxLjcwMDE5NTMxMjUsMjAyMi0wMS0wNAo0NTM5LjM5OTkwMjM0Mzc1LDIwMjItMDEtMDUKNDU2OC4zOTk5MDIzNDM3NSwyMDIyLTAxLTA2CjQ1MDQuMTAwMDk3NjU2MjUsMjAyMi0wMS0wNwo0NTEwLjc5OTgwNDY4NzUsMjAyMi0wMS0xMAo0NTM4LDIwMjItMDEtMTEKNDU0My4zOTk5MDIzNDM3NSwyMDIyLTAxLTEyCjQ0ODUuNSwyMDIyLTAxLTEz"
-          },
-          "endpoint_notificacion": {
-            "type": "string",
-            "example": "http://localhost:8083/actualizarEstadoModelo"
-          },
-          "UID": {
-            "type": "string",
-            "example": "ed806eaa-c596-11ed-afa1-0242ac120002"
           }
         }
       },
       "PredictInfo": {
         "required": [
-          "UID",
-          "days_to_predict",
-          "endpoint_notificacion"
+          "days_to_predict"
         ],
         "type": "object",
         "properties": {
           "days_to_predict": {
             "type": "integer",
             "example": 7
-          },
-          "endpoint_notificacion": {
-            "type": "string",
-            "example": "http://localhost:8083/actualizarEstadoModelo"
-          },
-          "UID": {
-            "type": "string",
-            "example": "ed806eaa-c596-11ed-afa1-0242ac120002"
           }
         }
       },
