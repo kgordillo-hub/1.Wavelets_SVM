@@ -8,9 +8,10 @@ import pandas as pd
 from io import StringIO
 from flask import Response, request
 from Algorithm.SVM_Wavelet import train_model, make_prediction
-from threading import Thread
+from flask_cors import CORS
 
 application = flask.Flask(__name__)
+CORS(application)
 
 trained = False
 
