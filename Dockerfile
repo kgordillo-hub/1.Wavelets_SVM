@@ -3,7 +3,10 @@ ARG FUNCTION_DIR="/function"
 FROM python:3.8
 
 RUN apt-get update &&\
-    apt install -y python3-pip
+    apt install -y python3-pip &&\
+	apt install tzdata -y
+
+ENV TZ="America/Bogota"
 
 COPY ./ /${FUNCTION_DIR}/
 

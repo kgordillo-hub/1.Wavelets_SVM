@@ -15,7 +15,7 @@ CORS(application)
 
 trained = False
 
-@application.route("/waveletsSVM/trainModel", methods=["POST"])
+@application.route("/trainModel", methods=["POST"])
 def train():
     if request.json is None:
         # Expect application/json request
@@ -34,12 +34,12 @@ def train():
             closing_prices = df['closing_price'].values.tolist()
             dates = df['dates'].values.tolist()
 
-            print("Closing prices: ", closing_prices)
-            print("Dates: ", dates)
-            y_pred, y_test = train_model(closing_prices=closing_prices, dates=dates)
+            #print("Closing prices: ", closing_prices)
+            #print("Dates: ", dates)
+            y_pred, y_test, dates_p = train_model(closing_prices=closing_prices, dates=dates)
             global trained
             trained = True
-            service_response = {'Predicted_values': y_pred.tolist(), 'Real_values': y_test.tolist()}
+            service_response = {'Predicted_values': y_pred.tolist(), 'Real_values': y_test, 'Dates': dates_p}
             #response = Response("Trained", 200)
             response = Response(json.dumps(service_response, default=str).encode('UTF-8'), 200)
         except Exception as ex:
@@ -49,7 +49,7 @@ def train():
     return response
 
 
-@application.route("/waveletsSVM/predict", methods=["POST"])
+@application.route("/predict", methods=["POST"])
 def predict():
     global trained
     if request.json is None:

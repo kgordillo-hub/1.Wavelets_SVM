@@ -1,6 +1,7 @@
 # Standard libraries
 import numpy as np
 import pandas as pd
+from datetime import datetime
 
 from sklearn import svm
 from numpy.lib.stride_tricks import sliding_window_view
@@ -16,6 +17,7 @@ Y_global = []
 dates_global = []
 sc_y = None
 svr = None
+
 
 def train_model(closing_prices, dates, window_length=12):
     #time.sleep(10)
@@ -41,22 +43,34 @@ def train_model(closing_prices, dates, window_length=12):
     global sc_y
     sc_y = MinMaxScaler(feature_range=(0, 1))
 
-    global X_global
-    X_global = sc_x.fit_transform(X)
-    global Y_global
-    Y_global = sc_y.fit_transform(np.reshape(Y, (-1, 1))).ravel()
 
-    x_train,x_test,y_train,y_test = train_test_split(X_global, Y_global, test_size=0.25, random_state=None, shuffle=False)
+    X_svm = sc_x.fit_transform(X)
+    Y_svm = sc_y.fit_transform(np.reshape(Y, (-1, 1))).ravel()
+
+    x_train,x_test,y_train,y_test = train_test_split(X_svm, Y_svm, test_size=0.25, random_state=None, shuffle=False)
+    X_closing, Y_closing = slide_window(closing_prices,window_length)
+    _, _, _, y_real = train_test_split(X_closing, Y_closing, test_size=0.25, random_state=None, shuffle=False)
+
+    X_dates, Y_dates = slide_window(dates, window_length)
+    _, dates_real = train_test_split(Y_dates, test_size=0.25, random_state=None, shuffle=False)
+    print(dates_real)
+
 
     y_pred = train_model_approx(x_train, y_train).predict(x_test)
 
+    global Y_global
+    Y_global = sc_y.fit_transform(np.reshape(Y_closing, (-1, 1))).ravel()
+    global X_global
+    X_global = sc_x.fit_transform(X_closing)
+
     global svr
-    svr = train_model_approx(X_global, Y_global)
+    svr = train_model_approx(X_svm, Y_svm)
+
 
     print("Training completed...")
     y_pred = sc_y.inverse_transform(y_pred.reshape(1, -1)).ravel()
-    y_test = sc_y.inverse_transform(y_test.reshape(1, -1)).ravel()
-    return y_pred, y_test
+    #y_test = sc_y.inverse_transform(y_test.reshape(1, -1)).ravel()
+    return y_pred, y_real, dates_real
 
 
 def make_prediction(prediction_days=3, past_days=12):
@@ -72,11 +86,14 @@ def make_prediction(prediction_days=3, past_days=12):
     print("Pred_days: " + str(prediction_days))
     for i in range(prediction_days):
         Y_array = np.array([Y_[-1]])
+        #print('Y array', sc_y.inverse_transform(Y_array.reshape(1, -1)))
         X_array = np.array(X_[-1][-past_days + 1:])
+        print('X array', sc_y.inverse_transform(X_array.reshape(1, -1)))
         X_Y_concat = np.array([np.concatenate((X_array, Y_array))])
         X_ = np.concatenate((X_, X_Y_concat))
         p_value = svr.predict(X_[-1].reshape(1, -1))
         Y_ = np.concatenate((Y_, p_value))
+        print(sc_y.inverse_transform(X_Y_concat))
 
     y_pred = Y_[:prediction_days]
     result = sc_y.inverse_transform(y_pred.reshape(1, -1)).ravel()
@@ -98,14 +115,13 @@ def slide_window(series, window_length=2):
 
 
 # Using modwt with 'sym4' wavelet and 5 levels (4 detail coefficients (dC) and 1 approximation coefficient (aC))
-def apply_modwt(_data, type_s='sym4', _level=3):
+def apply_modwt(_data, type_s='sym4', _level=4):
     _coeff = modwt(_data, type_s, _level)
     return _coeff
 
 
-def get_coeff_from_series(closing_prices):
+def get_coeff_from_series(closing_prices, level=4):
     # calling function defined previously
-    level = 4
     coeff = apply_modwt(closing_prices, type_s='sym4', _level=level)
     return coeff
 
@@ -121,7 +137,8 @@ def train_model_approx(X, Y):
 def add_day_to_dates(prediction_days):
     _dates = np.array([])
     global dates_global
-    lastDate = np.array(dates_global)[-1]
+    #lastDate = np.array(dates_global)[-1]
+    lastDate = datetime.now();
     for i in range(prediction_days):
         newDate = pd.to_datetime(lastDate) + pd.DateOffset(days=i + 1)
         _dates = np.append(_dates, newDate)
